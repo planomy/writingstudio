@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Studio v3.1 (Semester Pack)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Comic+Neue:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .handwritten {
+            font-family: 'Comic Neue', cursive;
+        }
+
+        /* Custom Scrollbar */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        .dark textarea::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        /* Tab Scroll Hiding */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col transition-colors duration-300">
+
+    <!-- Header -->
+    <header class="bg-slate-900 dark:bg-slate-950 text-white p-4 shadow-lg sticky top-0 z-50 border-b border-transparent dark:border-slate-800">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i data-lucide="pen-tool" class="w-8 h-8 text-indigo-400"></i>
+                <div>
+                    <h1 class="text-xl font-bold leading-none">Writing <span class="text-indigo-400">Studio</span></h1>
+                    <p class="text-xs text-slate-400 mt-1">Semester Content Pack</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <button id="generate-button" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-full text-xs font-bold transition-colors flex items-center gap-2 shadow-lg shadow-indigo-500/30">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i> Generate New
+                </button>
+                <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all shadow-sm ring-1 ring-white/10">
+                    <i id="icon-moon" data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                    <i id="icon-sun" data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-[72px] z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex space-x-1 overflow-x-auto no-scrollbar py-2" id="tab-buttons">
+                <!-- Buttons injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full">
+        
+        <!-- Activity Container -->
+        <div id="tab-panels" class="w-full">
+            <!-- Panels injected by JS -->
+        </div>
+
+    </main>
+
+    <script>
+        // --- CONFIGURATION & UTILS ---
+        
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            lucide.createIcons();
+        }
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getNRandomItems(arr, num) {
+            // Clone array to avoid modifying original
+            const shuffled = [...arr].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, num);
+        }
+
+        // --- EXTENSIVE DATA BANKS (Semester Load) ---
+        
+        // 1. TENSE
+        const juniorTenseParagraphs = [
+            "My dog, Barnaby, is a very silly animal. He loves to chase his tail. He also thinks he is a parrot.",
+            "Our garden is full of surprises. My mum grows bright red tomatoes. My dad plants tall sunflowers.",
+            "Going to the beach is my favourite thing. I build giant sandcastles. My sister looks for shells.",
+            "My classroom is busy. Ms. April reads us stories. We use blocks to build towers.",
+            "My lizard, Sparky, is funny. He has green scales. He sits on a rock all day.",
+            "I walk to school every day. The sun shines brightly. Birds sing in the trees.",
+            "We play soccer at lunch. I run very fast. My friend kicks the ball into the goal.",
+            "My cat sleeps on the bed. She snores loudly. I pet her soft fur.",
+            "Grandma bakes cookies. The kitchen smells sweet. We eat them while they are warm.",
+            "The rain falls hard. Puddles form on the ground. I jump in them with my boots.",
+            "I watch a movie with my dad. It is very funny. We laugh a lot.",
+            "The teacher writes on the board. We copy the words. Everyone works quietly.",
+            "My brother plays the drums. He makes a lot of noise. I cover my ears.",
+            "We go to the zoo. The lions roar. The monkeys swing from trees.",
+            "I draw a picture of a dragon. It breathes fire. I use red and orange crayons.",
+            "The baby cries loudly. Mom gives her a bottle. She falls asleep.",
+            "We plant seeds in the dirt. We water them daily. Soon, flowers grow.",
+            "The car drives fast. We go to the shops. I sit in the back seat.",
+            "I brush my teeth. I wash my face. Then I put on my pajamas.",
+            "The wind blows the leaves. They fly in the air. It is autumn."
+        ];
+
+        const seniorTenseParagraphs = [
+            "The geopolitical landscape shifts rapidly as emerging economies assert influence. Technology bridges gaps, yet creates digital divides.",
+            "The protagonist wanders through the desolate city, observing ruins. Silence hangs heavy, broken only by the howling wind.",
+            "Scientific consensus indicates biodiversity loss accelerates. Ecosystems collapse as key species vanish from habitats.",
+            "The artist challenges perspectives by distorting reality. She uses chaotic brushstrokes to convey raw emotion.",
+            "Inflation impacts daily life, eroding purchasing power. The cost of goods rises, forcing difficult choices.",
+            "Climate patterns change drastically. Storms become more frequent. Coastal regions face rising sea levels.",
+            "The detective examines the evidence. He notices a small detail everyone else misses. The mystery unravels.",
+            "Social media algorithms shape public opinion. Users see content that reinforces their existing beliefs.",
+            "The architect designs a sustainable building. Solar panels cover the roof. Rainwater collection systems are installed.",
+            "Historians debate the causes of the war. Some point to economics, while others blame political alliances.",
+            "The athlete trains rigorously for the Olympics. She wakes up at dawn. Her diet is strictly monitored.",
+            "Artificial intelligence transforms the workforce. Automation replaces manual labor. New skills are required.",
+            "The novelist explores themes of isolation. Her characters struggle to connect in a fragmented society.",
+            "Astronomers discover a new exoplanet. It orbits a distant star. Conditions might support life.",
+            "The surgeon performs a delicate operation. The team works in unison. Every second counts.",
+            "Urban planning focuses on walkability. Cities reduce car usage. Green spaces are expanded.",
+            "The musician composes a symphony. He blends classical instruments with modern synthesisers.",
+            "Political polarization divides the nation. Debates become heated. Compromise seems impossible.",
+            "The virus spreads rapidly across borders. Health organizations coordinate a global response.",
+            "Quantum computing promises a revolution. Processing power increases exponentially. Encryption becomes vulnerable."
+        ];
+
+        // 2. VERBS (30+ pairs each)
+        const juniorVerbSentences = [
+            ["My brother <strong>made</strong> a tower.", "built/constructed"],
+            ["The rabbit <strong>went</strong> across the grass.", "hopped/dashed"],
+            ["I <strong>saw</strong> a spider.", "spotted/noticed"],
+            ["Dad <strong>said</strong> to be quiet.", "whispered"],
+            ["My cat <strong>looked</strong> at the bird.", "stared/gazed"],
+            ["Sarah <strong>got</strong> a present.", "received"],
+            ["My dog <strong>likes</strong> the ball.", "loves/adores"],
+            ["I <strong>was</strong> tired.", "felt"],
+            ["He <strong>ran</strong> to the shop.", "sprinted/raced"],
+            ["She <strong>ate</strong> the apple.", "crunched/devoured"],
+            ["The bird <strong>flew</strong> away.", "soared/fluttered"],
+            ["He <strong>took</strong> the pencil.", "grabbed/snatched"],
+            ["She <strong>put</strong> the book down.", "placed"],
+            ["The car <strong>went</strong> fast.", "zoomed/sped"],
+            ["I <strong>scared</strong> him.", "startled/terrified"],
+            ["The wind <strong>blew</strong>.", "howled/whistled"],
+            ["He <strong>threw</strong> the ball.", "hurled/tossed"],
+            ["She <strong>cried</strong> loudly.", "sobbed/wailed"],
+            ["The glass <strong>broke</strong>.", "shattered/smashed"],
+            ["He <strong>walked</strong> slowly.", "trudged/plodded"],
+            ["The snake <strong>moved</strong>.", "slithered"],
+            ["I <strong>fixed</strong> the toy.", "repaired"],
+            ["The fire <strong>burned</strong>.", "blazed/roared"],
+            ["She <strong>wrote</strong> a story.", "composed"],
+            ["He <strong>cut</strong> the paper.", "sliced/snipped"]
+        ];
+
+        const seniorVerbSentences = [
+            ["The politician <strong>said</strong> the policy would help.", "asserted/proclaimed"],
+            ["The scientist <strong>looked at</strong> the data.", "analyzed/scrutinized"],
+            ["The noise <strong>stopped</strong> the concert.", "disrupted/halted"],
+            ["The author <strong>shows</strong> the theme.", "illustrates/exemplifies"],
+            ["The army <strong>beat</strong> the enemy.", "vanquished/defeated"],
+            ["She <strong>thought about</strong> the problem.", "contemplated/pondered"],
+            ["The law <strong>changed</strong> business.", "revolutionized/transformed"],
+            ["The wind <strong>broke</strong> the silence.", "shattered/pierced"],
+            ["The evidence <strong>proves</strong> he is guilty.", "demonstrates/confirms"],
+            ["The situation <strong>got worse</strong>.", "deteriorated/escalated"],
+            ["He <strong>gave</strong> a reason.", "offered/cited"],
+            ["The company <strong>made</strong> a new product.", "developed/launched"],
+            ["She <strong>explained</strong> the idea.", "elucidated/clarified"],
+            ["The building <strong>fell</strong> down.", "collapsed/imploded"],
+            ["The crowd <strong>moved</strong> forward.", "surged/advanced"],
+            ["He <strong>wants</strong> power.", "craves/covets"],
+            ["The movie <strong>made</strong> me sad.", "evoked sadness/depressed"],
+            ["They <strong>talked</strong> about the plan.", "discussed/debated"],
+            ["The river <strong>goes</strong> through the city.", "meanders/flows"],
+            ["The light <strong>shone</strong> brightly.", "radiated/beamed"],
+            ["The smell <strong>was bad</strong>.", "reeked/was pungent"],
+            ["He <strong>found out</strong> the truth.", "discovered/uncovered"],
+            ["She <strong>keeps</strong> her opinion secret.", "conceals/withholds"],
+            ["The team <strong>worked together</strong>.", "collaborated"],
+            ["The result <strong>surprised</strong> us.", "astonished/confounded"]
+        ];
+
+        // 3. STARTS (30+ items)
+        const juniorBadStarts = [
+            "There is a big truck.", "It is a sunny day.", "A bird is in the tree.", "This is my puppy.", "They are playing.",
+            "It was cold.", "There were kids.", "This is the best game.", "He was brave.", "She is fast.",
+            "It rained all night.", "There is a monster.", "A new store opened.", "These are shoes.", "We went to the park.",
+            "I saw a cat.", "He likes pizza.", "She has a bike.", "It is fun.", "They ran home.",
+            "There are flowers.", "This is my house.", "We are happy.", "It was dark.", "A dog barked."
+        ];
+
+        const seniorBadStarts = [
+            "There are many factors.", "It is generally agreed.", "This essay will discuss.", "It is important to note.", "There is a difference.",
+            "It can be seen that.", "One of the things is.", "Basically, the author says.", "In conclusion, I think.", "It is obvious that.",
+            "There are people who.", "This shows that.", "Another point is.", "It is interesting that.", "There was a time when.",
+            "Ideally, we should.", "Historically speaking.", "As a matter of fact.", "Needless to say.", "It goes without saying.",
+            "To be honest.", "At the end of the day.", "In today's society.", "First of all.", "For the most part."
+        ];
+
+        // 4. STOP WORDS
+        const juniorStopWords = [
+            "<strong>The</strong> dog <strong>that is</strong> brown <strong>is</strong> mine.",
+            "<strong>I am</strong> tired <strong>at this</strong> moment.",
+            "<strong>There is a</strong> total <strong>of</strong> ten.",
+            "<strong>He is</strong> always <strong>in a</strong> hurry.",
+            "<strong>I went to the</strong> store <strong>and I</strong> bought.",
+            "<strong>She is a</strong> girl <strong>who is</strong> nice.",
+            "<strong>It is the</strong> color <strong>of</strong> blue.",
+            "<strong>I have a</strong> feeling <strong>that</strong>.",
+            "<strong>He was</strong> happy <strong>because of</strong> it.",
+            "<strong>There are</strong> many <strong>of the</strong> birds."
+        ];
+
+        const seniorStopWords = [
+            "<strong>It is a</strong> truth <strong>that is</strong> universally acknowledged.",
+            "<strong>In the</strong> event <strong>that</strong> you <strong>are</strong> late.",
+            "<strong>The</strong> general consensus <strong>of</strong> opinion <strong>is that</strong>.",
+            "<strong>I am of the</strong> understanding <strong>that</strong>.",
+            "<strong>The</strong> point <strong>of</strong> this <strong>is to make an</strong> argument.",
+            "<strong>Due to the</strong> fact <strong>that</strong>.",
+            "<strong>In</strong> spite <strong>of the</strong> fact <strong>that</strong>.",
+            "<strong>At this</strong> point <strong>in</strong> time.",
+            "<strong>Until such</strong> time <strong>as</strong>.",
+            "<strong>With</strong> regard <strong>to the</strong> matter <strong>of</strong>."
+        ];
+
+        // 5. PUZZLES (30+ Words)
+        const juniorPuzzles = ["TEACHER", "FRIENDS", "HOLIDAY", "BANANA", "ORANGE", "ELEPHANT", "PIRATE", "MONKEY", "GARDEN", "SCHOOL", "SOCCER", "SUMMER", "WINTER", "CASTLE", "DRAGON", "FAMILY", "YELLOW", "CIRCLE", "ANIMAL", "FOREST", "PLANET", "ROCKET", "DOCTOR", "WINDOW", "PICNIC"];
+        const seniorPuzzles = ["MISUNDERSTANDING", "CHARACTERISTIC", "REPRESENTATION", "EXTRAORDINARY", "ENVIRONMENTAL", "SOPHISTICATED", "CONSEQUENCES", "INVESTIGATION", "REVOLUTIONARY", "COMMUNICATION", "MATHEMATICS", "CIVILIZATION", "ARCHAEOLOGY", "DISAPPOINTMENT", "RESPONSIBILITY", "CONSTITUTION", "UNBELIEVABLE", "INTELLIGENCE", "PERSPECTIVE", "DETERMINATION", "INDEPENDENCE", "SATISFACTION", "PARTICIPATION", "ACKNOWLEDGE", "CELEBRATION"];
+
+        // 6. PERSUASIVE (20+ Topics)
+        const juniorPersuasiveTopics = [
+            "Should homework be banned?", "Is summer the best season?", "Cats vs Dogs?", "Should recess be longer?", 
+            "Should we wear uniforms?", "Is Minecraft educational?", "Should kids cook dinner?", "Are video games good?",
+            "Should school start later?", "Is it better to be an only child?", "Should junk food be banned at school?",
+            "Are zoos cruel?", "Should kids get paid for chores?", "Books vs Movies?", "Should we have 3-day weekends?",
+            "Is space travel important?", "Should plastic bags be banned?", "Is art class important?", "Should we have class pets?",
+            "Is breakfast the most important meal?"
+        ];
+        const seniorPersuasiveTopics = [
+            "Is AI a threat?", "Should voting be mandatory?", "Ethics of zoos?", "Space exploration cost?", 
+            "Social media age limits?", "Is graffiti art or vandalism?", "Should college be free?", "Nuclear energy?",
+            "Driverless cars?", "Animal testing?", "The death penalty?", "Universal basic income?",
+            "Banning single-use plastics?", "GMO foods?", "Privacy vs Security?", "Wealth inequality?",
+            "Climate change action?", "Standardized testing?", "Minimum wage?", "Censorship on the internet?"
+        ];
+
+        // 7. FACTS (20 Sets)
+        const juniorFacts = [
+            { topic: "Emperor Penguins", facts: ["Tallest penguin", "Antarctica", "Males protect eggs", "Mothers hunt"] },
+            { topic: "Volcanoes", facts: ["Openings in crust", "Lava/ash", "Magma underground", "Create islands"] },
+            { topic: "Honeybees", facts: ["Live in hives", "Queen bee rules", "Make honey", "Pollinate flowers"] },
+            { topic: "Mars", facts: ["Red Planet", "Has two moons", "Huge dust storms", "Rovers explore it"] },
+            { topic: "Sharks", facts: ["Fish not mammals", "Cartilage skeletons", "Multiple rows of teeth", "Can smell blood"] },
+            { topic: "The Moon", facts: ["Orbits Earth", "No atmosphere", "Craters", "Controls tides"] },
+            { topic: "Cheetahs", facts: ["Fastest land animal", "Spots for camouflage", "Cannot roar", "Live in Africa"] },
+            { topic: "The Amazon", facts: ["Biggest rainforest", "South America", "Lots of oxygen", "Many rare animals"] },
+            { topic: "Dinosaurs", facts: ["Lived long ago", "Some flew", "Some ate plants", "Extinct by meteor"] },
+            { topic: "Spiders", facts: ["8 legs", "Spin webs", "Eat insects", "Most not dangerous"] },
+            { topic: "The Ocean", facts: ["Covers 70% of Earth", "Saltwater", "Deep trenches", "Coral reefs"] },
+            { topic: "Butterflies", facts: ["Start as caterpillars", "Form chrysalis", "Taste with feet", "Migrate"] },
+            { topic: "Castles", facts: ["Built for defense", "Stone walls", "Moats", "Knights lived there"] },
+            { topic: "The Arctic", facts: ["North Pole", "Polar bears", "Sea ice", "Midnight sun"] },
+            { topic: "Kangaroos", facts: ["Marsupials", "Pouches for babies", "Strong legs", "Australia"] }
+        ];
+        
+        const seniorFacts = [
+            { topic: "Industrial Revolution", facts: ["Started in UK", "Steam power", "Urbanization", "Factory system"] },
+            { topic: "Black Holes", facts: ["Gravity prevents light escaping", "Dying stars", "Event horizon", "Time dilation"] },
+            { topic: "The Titanic", facts: ["Unsinkable", "Hit iceberg", "1912", "Lack of lifeboats"] },
+            { topic: "DNA", facts: ["Double helix", "Genetic code", "Watson & Crick", "Determines traits"] },
+            { topic: "The Cold War", facts: ["USA vs USSR", "No direct fighting", "Arms race", "Space race"] },
+            { topic: "Renewable Energy", facts: ["Solar/Wind", "Reduces carbon", "Sustainable", "Technology improving"] },
+            { topic: "The Brain", facts: ["Neurons", "Hemispheres", "Plasticity", "Consumes 20% energy"] },
+            { topic: "Ancient Rome", facts: ["Empire", "Republic first", "Roads/Aqueducts", "Colosseum"] },
+            { topic: "Antibiotics", facts: ["Kill bacteria", "Penicillin", "Alexander Fleming", "Resistance growing"] },
+            { topic: "The Internet", facts: ["Global network", "Started as ARPANET", "Information sharing", "Changed commerce"] },
+            { topic: "Plate Tectonics", facts: ["Moving crust", "Earthquakes", "Continental drift", "Pangea"] },
+            { topic: "Photosynthesis", facts: ["Plants make food", "Sunlight/Water/CO2", "Produces Oxygen", "Chlorophyll"] },
+            { topic: "The Great Depression", facts: ["1929 Crash", "Unemployment", "Dust Bowl", "New Deal"] },
+            { topic: "Globalization", facts: ["Interconnected world", "Trade", "Cultural exchange", "Economic interdependence"] },
+            { topic: "Evolution", facts: ["Charles Darwin", "Natural selection", "Survival of fittest", "Common ancestors"] }
+        ];
+
+        // 8. VOCAB (60 Words each)
+        const juniorVocab = [
+            { word: "curious", def: "Eager to learn.", ex: "The curious cat." },
+            { word: "ancient", def: "Very old.", ex: "Ancient ruins." },
+            { word: "exhausted", def: "Very tired.", ex: "I was exhausted." },
+            { word: "enormous", def: "Very big.", ex: "Enormous elephant." },
+            { word: "delicate", def: "Easily broken.", ex: "Delicate flower." },
+            { word: "furious", def: "Very angry.", ex: "He was furious." },
+            { word: "gleaming", def: "Shining brightly.", ex: "Gleaming sword." },
+            { word: "hideous", def: "Very ugly.", ex: "Hideous monster." },
+            { word: "invent", def: "Make something new.", ex: "Invent a machine." },
+            { word: "journey", def: "A long trip.", ex: "A long journey." },
+            { word: "keen", def: "Eager/Sharp.", ex: "Keen eyesight." },
+            { word: "loyal", def: "Faithful.", ex: "Loyal friend." },
+            { word: "mysterious", def: "Hard to explain.", ex: "Mysterious noise." },
+            { word: "nervous", def: "Worried.", ex: "Nervous about test." },
+            { word: "observe", def: "Watch carefully.", ex: "Observe the birds." },
+            { word: "peculiar", def: "Strange.", ex: "Peculiar taste." },
+            { word: "quick", def: "Fast.", ex: "Quick runner." },
+            { word: "reveal", def: "Show something hidden.", ex: "Reveal the secret." },
+            { word: "sturdy", def: "Strong.", ex: "Sturdy table." },
+            { word: "terrified", def: "Very scared.", ex: "Terrified of spiders." }
+        ];
+
+        const seniorVocab = [
+            { word: "ubiquitous", def: "Found everywhere.", ex: "Smartphones are ubiquitous." },
+            { word: "ephemeral", def: "Short-lived.", ex: "Ephemeral beauty." },
+            { word: "pragmatic", def: "Sensible/Realistic.", ex: "Pragmatic decision." },
+            { word: "ambiguous", def: "Unclear.", ex: "Ambiguous ending." },
+            { word: "benevolent", def: "Kind.", ex: "Benevolent leader." },
+            { word: "candid", def: "Honest.", ex: "Candid interview." },
+            { word: "diligent", def: "Hard-working.", ex: "Diligent student." },
+            { word: "eloquent", def: "Speaking well.", ex: "Eloquent speech." },
+            { word: "fluctuate", def: "Change often.", ex: "Prices fluctuate." },
+            { word: "gregarious", def: "Sociable.", ex: "Gregarious person." },
+            { word: "hypothetical", def: "Theoretical.", ex: "Hypothetical situation." },
+            { word: "inevitable", def: "Unavoidable.", ex: "Inevitable result." },
+            { word: "juxtapose", def: "Place together for contrast.", ex: "Juxtapose old and new." },
+            { word: "lucid", def: "Clear.", ex: "Lucid explanation." },
+            { word: "meticulous", def: "Very careful.", ex: "Meticulous work." },
+            { word: "nuance", def: "Subtle difference.", ex: "Nuance of meaning." },
+            { word: "obsolete", def: "Out of date.", ex: "Obsolete technology." },
+            { word: "paradox", def: "Contradiction.", ex: "Logical paradox." },
+            { word: "resilient", def: "Strong/Recovering.", ex: "Resilient community." },
+            { word: "scrutinize", def: "Examine closely.", ex: "Scrutinize the deal." }
+        ];
+
+        // 9. PUNCTUATION (20 Examples each)
+        const juniorPunctuation = [
+            "in the movie finding nemo a small clownfish gets lost. his dad marlin has to find him",
+            "my favorite food is pizza ice cream and apples i eat them every friday",
+            "where are you going asked mom i am going to the park said tom",
+            "the dog barked loudly at the mailman he was scared",
+            "i cant believe its raining again said sarah",
+            "do you like blue red or green asked the teacher",
+            "mr jones is a nice teacher he lives in london",
+            "wow that is a huge balloon shouted the boy",
+            "on saturday we went to the zoo we saw lions tigers and bears",
+            "shes my best friend we play together every day"
+        ];
+        const seniorPunctuation = [
+            "the novel 1984 by george orwell is set in a totalitarian state the government watches everyone",
+            "however the data suggests a different conclusion consequently we must rethink our strategy",
+            "shakespeare's play macbeth explores ambition guilt and destiny it is a tragedy",
+            "although it was raining the game continued the players were soaked",
+            "the doctor said take two pills daily and drink water",
+            "its clear that the companys profits are falling investors are worried",
+            "the eiffel tower which is in paris was built in 1889",
+            "stop shouted the police officer freeze right there",
+            "to be or not to be that is the question",
+            "climate change is a global issue it affects weather sea levels and agriculture"
+        ];
+
+        // 10. SPELLING (60 words)
+        const juniorSpelling = [
+            { mis: "becuse", cor: "because" }, { mis: "frend", cor: "friend" }, { mis: "whent", cor: "went" }, { mis: "skool", cor: "school" },
+            { mis: "peeple", cor: "people" }, { mis: "thay", cor: "they" }, { mis: "sed", cor: "said" }, { mis: "wuz", cor: "was" },
+            { mis: "duz", cor: "does" }, { mis: "verry", cor: "very" }, { mis: "wich", cor: "which" }, { mis: "cum", cor: "come" },
+            { mis: "sum", cor: "some" }, { mis: "littel", cor: "little" }, { mis: "wen", cor: "when" }, { mis: "wher", cor: "where" },
+            { mis: "hav", cor: "have" }, { mis: "giv", cor: "give" }, { mis: "mek", cor: "make" }, { mis: "lik", cor: "like" }
+        ];
+
+        const seniorSpelling = [
+            { mis: "neccesary", cor: "necessary" }, { mis: "occured", cor: "occurred" }, { mis: "embarass", cor: "embarrass" },
+            { mis: "privilage", cor: "privilege" }, { mis: "separate", cor: "separate" }, { mis: "definitly", cor: "definitely" },
+            { mis: "arguement", cor: "argument" }, { mis: "publically", cor: "publicly" }, { mis: "independant", cor: "independent" },
+            { mis: "resistence", cor: "resistance" }, { mis: "appearence", cor: "appearance" }, { mis: "basicly", cor: "basically" },
+            { mis: "beggining", cor: "beginning" }, { mis: "belive", cor: "believe" }, { mis: "buisness", cor: "business" },
+            { mis: "calender", cor: "calendar" }, { mis: "collegue", cor: "colleague" }, { mis: "concensus", cor: "consensus" },
+            { mis: "dicipline", cor: "discipline" }, { mis: "existance", cor: "existence" }
+        ];
+
+        // 11. STORY (20 Prompts)
+        const juniorStory = { topic: "Adventure", starters: ["I found a key...", "The door creaked...", "Behind the wall...", "The map led to...", "Suddenly, a noise...", "The spaceship landed...", "The dragon woke up...", "I shrank to the size of an ant...", "The toys came alive...", "It was a dark and stormy night..."] };
+        const seniorStory = { topic: "Thriller", starters: ["It wasn't supposed to end this way...", "Trust is a fragile thing...", "He looked at me with cold eyes...", "The phone rang at midnight...", "I knew I was being watched...", "The evidence was missing...", "She vanished without a trace...", "The clock was ticking...", "I made a terrible mistake...", "The secret was out..."] };
+
+        // 12. SHOW DON'T TELL (30 Emotions)
+        const juniorShowDontTell = ["Happy", "Sad", "Angry", "Cold", "Tired", "Hungry", "Scared", "Excited", "Bored", "Hot", "Sick", "Surprised", "Shy", "Proud", "Nervous", "Thirsty", "Hurt", "Lonely", "Strong", "Weak"];
+        const seniorShowDontTell = ["Anxious", "Arrogant", "Regretful", "Overwhelmed", "Suspicious", "Relieved", "Impatient", "Jealous", "Guilty", "Confused", "Determined", "Hopeless", "Infatuated", "Indifferent", "Frustrated", "Awed", "Disgusted", "Nostalgic", "Embarrassed", "Paranoid"];
+
+        // 13. METAPHOR (30 Pairs)
+        const juniorMetaphors = [
+            ["Sun", "Ball"], ["Moon", "Light"], ["Thunder", "Drum"], ["Wind", "Whistle"], ["Rain", "Tears"], ["Book", "Door"],
+            ["School", "Zoo"], ["Idea", "Lightbulb"], ["Life", "Game"], ["Anger", "Fire"], ["Love", "Heart"], ["Time", "River"],
+            ["Snow", "Blanket"], ["Stars", "Diamonds"], ["Fog", "Curtain"], ["Cloud", "Cotton"], ["Tree", "Umbrella"], ["Road", "Ribbon"],
+            ["City", "Jungle"], ["Computer", "Brain"]
+        ];
+        const seniorMetaphors = [
+            ["Time", "Thief"], ["Jealousy", "Monster"], ["Hope", "Bird"], ["Anger", "Volcano"], ["School", "Factory"], ["Life", "Highway"],
+            ["Memory", "Ghost"], ["Society", "Machine"], ["Truth", "Mirror"], ["Lie", "Web"], ["Fear", "Prison"], ["Love", "Battlefield"],
+            ["Success", "Ladder"], ["Failure", "Teacher"], ["Depression", "Fog"], ["Future", "Horizon"], ["Past", "Shadow"], ["Money", "Drug"],
+            ["Power", "Drug"], ["Wisdom", "Light"]
+        ];
+
+        // 14. ACTIVE VOICE (20 Sentences)
+        const juniorPassive = [
+            "The ball was thrown by the boy.", "The cake was eaten by the dog.", "The song was sung by the class.", "The picture was painted by Mary.",
+            "The window was broken by the ball.", "The race was won by the hare.", "The mouse was chased by the cat.", "The book was read by the teacher.",
+            "The car was washed by dad.", "The flowers were watered by mom.", "The letter was written by me.", "The game was played by us.",
+            "The cookies were baked by grandma.", "The house was built by them.", "The fish was caught by the bear."
+        ];
+        const seniorPassive = [
+            "The decision was made by the committee.", "Mistakes were made during the experiment.", "The novel was written by the author in 1920.", "The city was destroyed by the hurricane.",
+            "The law was passed by the senate.", "The theory was proven by the data.", "The message was received by the general.", "The error was corrected by the technician.",
+            "The painting was stolen by the thief.", "The solution was found by the student.", "The goal was achieved by the team.", "The policy was criticized by the public.",
+            "The concert was attended by thousands.", "The dinner was cooked by the chef.", "The questions were answered by the expert."
+        ];
+
+
+        // --- RENDER LOGIC ---
+
+        const activities = [
+            { id: 1, name: "Tense", icon: "clock" },
+            { id: 2, name: "Verbs", icon: "zap" },
+            { id: 3, name: "Starts", icon: "play-circle" },
+            { id: 4, name: "Stop Words", icon: "scissors" },
+            { id: 5, name: "Puzzle", icon: "puzzle" },
+            { id: 6, name: "Persuasive", icon: "message-square" },
+            { id: 7, name: "Facts", icon: "list" },
+            { id: 8, name: "Vocab", icon: "book-open" },
+            { id: 9, name: "Punctuation", icon: "pen-line" },
+            { id: 10, name: "Spelling", icon: "check-check" },
+            { id: 11, name: "Story", icon: "feather" },
+            { id: 12, name: "Show Don't Tell", icon: "eye" },
+            { id: 13, name: "Metaphor", icon: "infinity" },
+            { id: 14, name: "Active Voice", icon: "arrow-right" }
+        ];
+
+        function renderTabs() {
+            const container = document.getElementById('tab-buttons');
+            container.innerHTML = activities.map((act, index) => `
+                <button 
+                    onclick="switchTab(${act.id})"
+                    class="tab-btn group flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap
+                    ${index === 0 ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}"
+                    data-id="${act.id}"
+                >
+                    <i data-lucide="${act.icon}" class="w-4 h-4"></i>
+                    ${act.name}
+                </button>
+            `).join('');
+        }
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if(parseInt(btn.dataset.id) === id) {
+                    btn.className = "tab-btn group flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300";
+                } else {
+                    btn.className = "tab-btn group flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800";
+                }
+            });
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            document.getElementById(`panel-${id}`).classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function createCard(title, content, type = 'text', solution = null) {
+            let contentHtml = '';
+            let subtitle = "Activity";
+            let placeholder = "Type your answer here...";
+            
+            if (type === 'text') {
+                contentHtml = `<p class="text-slate-800 dark:text-slate-200 text-lg leading-relaxed mb-4">${content}</p>`;
+                subtitle = "Read & Rewrite";
+            } else if (type === 'list') {
+                contentHtml = `<ul class="space-y-3 mb-4">${content.map(item => `
+                    <li class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                        ${item}
+                    </li>`).join('')}</ul>`;
+                subtitle = "Items to Fix";
+            } else if (type === 'verb_list') {
+                 contentHtml = `<ul class="space-y-4 mb-4">${content.map((item, idx) => `
+                    <li class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded border border-slate-200 dark:border-slate-700">
+                        <div class="mb-2 text-slate-800 dark:text-slate-200">${item[0]}</div>
+                        <div class="hidden text-sm text-green-600 dark:text-green-400 font-bold mt-2" id="sol-${title}-${idx}">Better option: ${item[1]}</div>
+                    </li>`).join('')}</ul>`;
+                subtitle = "Upgrade the Verbs";
+            } else if (type === 'puzzle') {
+                contentHtml = `<div class="text-center py-8"><h1 class="text-4xl md:text-5xl font-black text-indigo-900 dark:text-indigo-100 tracking-[0.2em]">${content}</h1><p class="text-slate-500 mt-2 text-sm">How many words can you make?</p></div>`;
+                subtitle = "Word Builder";
+            } else if (type === 'topic_list') {
+                contentHtml = `
+                    <div class="mb-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Topic</span>
+                        <h4 class="text-xl font-bold text-slate-800 dark:text-white">${content.topic}</h4>
+                    </div>
+                    <ul class="space-y-2 mb-4">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Ideas/Starters</span>
+                        ${content.list.map(i => `<li class="text-slate-600 dark:text-slate-300 text-sm">• ${i}</li>`).join('')}
+                    </ul>
+                `;
+                subtitle = "Writing Prompt";
+            } else if (type === 'vocab') {
+                contentHtml = `<ul class="space-y-4 mb-4">${content.map(item => `
+                    <li class="p-3 bg-slate-50 dark:bg-slate-900/50 rounded border border-slate-200 dark:border-slate-700">
+                        <div class="font-bold text-indigo-600 dark:text-indigo-400 text-lg">${item.word}</div>
+                        <div class="text-slate-600 dark:text-slate-400 italic text-sm">${item.def}</div>
+                        <div class="text-slate-800 dark:text-slate-200 mt-1 text-sm">"${item.ex}"</div>
+                    </li>`).join('')}</ul>`;
+                subtitle = "Words of the Week";
+            } else if (type === 'spelling') {
+                contentHtml = `<ul class="space-y-4 mb-4">${content.map(item => `
+                    <li class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded border border-slate-200 dark:border-slate-700">
+                        <div class="font-mono text-lg text-red-500 line-through decoration-2">${item.mis}</div>
+                        <div class="hidden text-green-600 dark:text-green-400 font-bold font-mono text-lg">${item.cor}</div>
+                    </li>`).join('')}</ul>`;
+                subtitle = "Correct the Errors";
+            } else if (type === 'emotion') {
+                contentHtml = `<div class="text-center py-8">
+                    <span class="text-xs font-bold text-slate-400 uppercase">Describe this feeling:</span>
+                    <h1 class="text-4xl font-bold text-indigo-900 dark:text-indigo-100 mt-2">${content}</h1>
+                    <p class="text-slate-500 mt-4 text-sm italic">Do not use the word "${content}". Describe the physical signs.</p>
+                </div>`;
+                subtitle = "Show, Don't Tell";
+                placeholder = "Her hands shook violently as she...";
+            } else if (type === 'metaphor') {
+                contentHtml = `<div class="text-center py-6">
+                    <div class="flex items-center justify-center gap-4 text-xl font-bold text-slate-800 dark:text-white">
+                        <div class="p-3 bg-indigo-100 dark:bg-indigo-900 rounded-lg">${content[0]}</div>
+                        <span class="text-slate-400">+</span>
+                        <div class="p-3 bg-indigo-100 dark:bg-indigo-900 rounded-lg">${content[1]}</div>
+                    </div>
+                    <p class="text-slate-500 mt-4 text-sm">Write a sentence combining these two concepts.</p>
+                </div>`;
+                subtitle = "Metaphor Machine";
+            } else if (type === 'passive') {
+                contentHtml = `<ul class="space-y-3 mb-4">${content.map(item => `
+                    <li class="bg-slate-50 dark:bg-slate-900/50 p-3 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                        ${item}
+                    </li>`).join('')}</ul>`;
+                subtitle = "Change to Active Voice";
+            }
+
+            let revealBtn = '';
+            if (type === 'verb_list' || type === 'spelling') {
+                revealBtn = `
+                    <button onclick="this.parentElement.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden')); this.remove()" class="mt-3 text-xs font-bold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                        Reveal Answers
+                    </button>
+                `;
+            }
+
+            return `
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col h-full">
+                    <div class="bg-slate-50 dark:bg-slate-900 p-3 border-b border-slate-200 dark:border-slate-700">
+                        <h3 class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide text-sm">${title} <span class="mx-2 opacity-50">|</span> <span class="text-indigo-500 text-xs">${subtitle}</span></h3>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col">
+                        ${contentHtml}
+                        ${revealBtn}
+                        <div class="mt-4">
+                            <label class="block text-xs uppercase font-bold text-slate-400 mb-1">Your Workspace</label>
+                            <textarea class="w-full h-32 p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:text-white handwritten resize-none" placeholder="${placeholder}"></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderContent() {
+            const container = document.getElementById('tab-panels');
+            
+            const jTense = getRandomItem(juniorTenseParagraphs);
+            const sTense = getRandomItem(seniorTenseParagraphs);
+            const jVerbs = getNRandomItems(juniorVerbSentences, 5);
+            const sVerbs = getNRandomItems(seniorVerbSentences, 5);
+            const jStarts = getNRandomItems(juniorBadStarts, 5);
+            const sStarts = getNRandomItems(seniorBadStarts, 5);
+            const jStops = getNRandomItems(juniorStopWords, 5);
+            const sStops = getNRandomItems(seniorStopWords, 5);
+            const jPuzzle = getRandomItem(juniorPuzzles);
+            const sPuzzle = getRandomItem(seniorPuzzles);
+            const jPers = { topic: getRandomItem(juniorPersuasiveTopics), list: ["In my opinion...", "I believe that...", "For example...", "Finally..."] };
+            const sPers = { topic: getRandomItem(seniorPersuasiveTopics), list: ["It is undeniably true that...", "Critics may argue...", "However, the evidence suggests...", "Ultimately..."] };
+            const jFactData = getRandomItem(juniorFacts);
+            const sFactData = getRandomItem(seniorFacts);
+            const jFact = { topic: jFactData.topic, list: jFactData.facts };
+            const sFact = { topic: sFactData.topic, list: sFactData.facts };
+            const jVocab = getNRandomItems(juniorVocab, 3);
+            const sVocab = getNRandomItems(seniorVocab, 3);
+            const jPunc = getRandomItem(juniorPunctuation.length > 10 ? juniorPunctuation : [juniorPunctuation[0]]); // Ensure array handling
+            const sPunc = getRandomItem(seniorPunctuation.length > 10 ? seniorPunctuation : [seniorPunctuation[0]]);
+            const jSpell = getNRandomItems(juniorSpelling, 4);
+            const sSpell = getNRandomItems(seniorSpelling, 5);
+            
+            // Randomize story topic
+            const jStoryT = getRandomItem(juniorStory.starters);
+            const sStoryT = getRandomItem(seniorStory.starters);
+            const jStoryObj = { topic: "Adventure", list: getNRandomItems(juniorStory.starters, 4) };
+            const sStoryObj = { topic: "Thriller", list: getNRandomItems(seniorStory.starters, 4) };
+
+            const jShow = getRandomItem(juniorShowDontTell);
+            const sShow = getRandomItem(seniorShowDontTell);
+            const jMeta = getRandomItem(juniorMetaphors);
+            const sMeta = getRandomItem(seniorMetaphors);
+            const jActive = getNRandomItems(juniorPassive, 3);
+            const sActive = getNRandomItems(seniorPassive, 3);
+
+            // Re-map simple arrays to what createCard expects for Punctuation if needed (simple string)
+            const jPuncString = Array.isArray(juniorPunctuation) ? getRandomItem(juniorPunctuation) : juniorPunctuation;
+            const sPuncString = Array.isArray(seniorPunctuation) ? getRandomItem(seniorPunctuation) : seniorPunctuation;
+
+
+            container.innerHTML = `
+                <div id="panel-1" class="tab-panel grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jTense)} ${createCard("Senior Level", sTense)}
+                </div>
+                <div id="panel-2" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jVerbs, 'verb_list')} ${createCard("Senior Level", sVerbs, 'verb_list')}
+                </div>
+                <div id="panel-3" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jStarts, 'list')} ${createCard("Senior Level", sStarts, 'list')}
+                </div>
+                <div id="panel-4" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jStops, 'list')} ${createCard("Senior Level", sStops, 'list')}
+                </div>
+                <div id="panel-5" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jPuzzle, 'puzzle')} ${createCard("Senior Level", sPuzzle, 'puzzle')}
+                </div>
+                <div id="panel-6" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jPers, 'topic_list')} ${createCard("Senior Level", sPers, 'topic_list')}
+                </div>
+                <div id="panel-7" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jFact, 'topic_list')} ${createCard("Senior Level", sFact, 'topic_list')}
+                </div>
+                <div id="panel-8" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jVocab, 'vocab')} ${createCard("Senior Level", sVocab, 'vocab')}
+                </div>
+                <div id="panel-9" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jPuncString)} ${createCard("Senior Level", sPuncString)}
+                </div>
+                <div id="panel-10" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jSpell, 'spelling')} ${createCard("Senior Level", sSpell, 'spelling')}
+                </div>
+                <div id="panel-11" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jStoryObj, 'topic_list')} ${createCard("Senior Level", sStoryObj, 'topic_list')}
+                </div>
+                <div id="panel-12" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jShow, 'emotion')} ${createCard("Senior Level", sShow, 'emotion')}
+                </div>
+                <div id="panel-13" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jMeta, 'metaphor')} ${createCard("Senior Level", sMeta, 'metaphor')}
+                </div>
+                <div id="panel-14" class="tab-panel hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${createCard("Junior Level", jActive, 'passive')} ${createCard("Senior Level", sActive, 'passive')}
+                </div>
+            `;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTabs();
+            renderContent();
+            lucide.createIcons();
+            
+            document.getElementById('generate-button').addEventListener('click', () => {
+                renderContent();
+                const activeBtn = document.querySelector('.tab-btn[class*="bg-indigo-100"]');
+                if(activeBtn) {
+                    switchTab(parseInt(activeBtn.dataset.id));
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
